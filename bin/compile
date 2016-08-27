@@ -66,10 +66,11 @@ echo "Vendoring R $R_VERSION for $STACK stack ($BUILD_PACK_VERSION)" | indent
 # download and unpack binaries
 echo "Downloading and unpacking R binaries ($R_BINARIES)" | indent
 
-ln -s $BUILD_DIR /app
-
 pushd /app > /dev/null
 curl $R_BINARIES -s -o - | tar xzf - -C .
+pushd .root > /dev/null
+ln -s $BUILD_DIR app
+popd > /dev/null
 popd > /dev/null
 
 # environment
@@ -82,6 +83,8 @@ export PATH="$FAKECHROOT_DIR/sbin:$FAKECHROOT_DIR/bin:$PATH"
 # install dependencies from CRAN
 echo "Executing init.r script" | indent
 
+echo ======================================================================
+ls -ahlR /app
 echo ======================================================================
 $FAKECHROOT_DIR/bin/fakechroot /usr/bin/fakeroot /usr/sbin/chroot $CHROOT_DIR ls -ahlR /
 echo ======================================================================
