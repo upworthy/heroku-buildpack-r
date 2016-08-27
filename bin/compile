@@ -65,12 +65,14 @@ echo "Vendoring R $R_VERSION for $STACK stack ($BUILD_PACK_VERSION)" | indent
 
 # download and unpack binaries
 echo "Downloading and unpacking R binaries ($R_BINARIES)" | indent
-curl $R_BINARIES -s -o - | tar xzhf - -C $BUILD_DIR
+
+mkdir -p /app
+curl $R_BINARIES -s -o - | tar xzhf - -C /app
 
 # environment
-export TOOLS_DIR="$BUILD_DIR/.tools"
+export TOOLS_DIR="/app/.tools"
 export FAKECHROOT_DIR="$TOOLS_DIR/fakechroot"
-export CHROOT_DIR="$BUILD_DIR/.root"
+export CHROOT_DIR="/app/.root"
 export LD_LIBRARY_PATH="$FAKECHROOT_DIR/lib/fakechroot:$LD_LIBRARY_PATH"
 export PATH="$FAKECHROOT_DIR/sbin:$FAKECHROOT_DIR/bin:$PATH"
 
@@ -102,5 +104,12 @@ fi
 # copy over environment
 mkdir -p "$BUILD_DIR/.profile.d"
 cp "$LP_DIR/bin/renv.sh" "$BUILD_DIR/.profile.d/renv.sh"
+
+# copy to build directory
+mkdir -p $BUILD_DIR/.tools
+cp -r /app/.tools/* $BUILD_DIR/.tools
+
+mkdir -p $BUILD_DIR/.root
+cp -r /app/.root/* $BUILD_DIR/.root
 
 # TODO: cache build
