@@ -78,16 +78,20 @@ export CHROOT_DIR="/app/.root"
 export LD_LIBRARY_PATH="$FAKECHROOT_DIR/lib/fakechroot:$LD_LIBRARY_PATH"
 export PATH="$FAKECHROOT_DIR/sbin:$FAKECHROOT_DIR/bin:$PATH"
 
+ln -s $LP_DIR /app/.app
+
 # install dependencies from CRAN
 echo "Executing init.r script" | indent
 
-$FAKECHROOT_DIR/bin/fakechroot /usr/bin/fakeroot /usr/sbin/chroot $CHROOT_DIR ls -ahlR /usr/lib/R/etc
+echo ======================================================================
+$FAKECHROOT_DIR/bin/fakechroot /usr/bin/fakeroot /usr/sbin/chroot $CHROOT_DIR ls -ahlR /
+echo ======================================================================
 
 # set the CRAN mirror and run the init.r program
 # working directory must be BUILD_DIR so that local packages/scripts can be found
 $FAKECHROOT_DIR/bin/fakechroot /usr/bin/fakeroot /usr/sbin/chroot $CHROOT_DIR /usr/bin/R --no-save -s <<RPROG 2>&1 | indent
   cat("\n=====> init.r Starting...\n")
-  setwd("$BUILD_DIR")
+  setwd("/app/.app")
   r <- getOption("repos");
   r["CRAN"] <- "$CRAN_MIRROR";
   options(repos=r);
