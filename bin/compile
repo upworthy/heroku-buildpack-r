@@ -73,7 +73,7 @@ mv $BUILD_DIR/app/.root $BUILD_DIR/.root
 export TOOLS_DIR="$BUILD_DIR/.tools"
 export FAKECHROOT_DIR="$TOOLS_DIR/fakechroot"
 export CHROOT_DIR="$BUILD_DIR/.root"
-export LD_LIBRARY_PATH="$FAKECHROOT_DIR/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$FAKECHROOT_DIR/lib/fakechroot:$LD_LIBRARY_PATH"
 export PATH="$FAKECHROOT_DIR/sbin:$FAKECHROOT_DIR/bin:$PATH"
 
 # install dependencies from CRAN
