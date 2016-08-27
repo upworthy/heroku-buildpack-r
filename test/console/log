@@ -1,0 +1,15 @@
+/tmp/tmp.veclNKz2JL ~/CS/Projects/heroku/heroku-buildpack-r/src2/test/console
+Initialized empty Git repository in /tmp/tmp.veclNKz2JL/.git/
+[master (root-commit) f061a27] initial
+ 6 files changed, 69 insertions(+)
+ create mode 100644 .r-buildpack-version
+ create mode 100644 .r-version
+ create mode 100755 init.r
+ create mode 100755 install
+ create mode 100644 log
+ create mode 100644 prog.r
+https://nameless-tundra-76776.herokuapp.com/ | https://git.heroku.com/nameless-tundra-76776.git
+
+
+bash: prog.r: command not found
+~/CS/Projects/heroku/heroku-buildpack-r/src2/test/console

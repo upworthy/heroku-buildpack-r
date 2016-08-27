@@ -66,7 +66,8 @@ echo "Vendoring R $R_VERSION for $STACK stack ($BUILD_PACK_VERSION)" | indent
 # download and unpack binaries
 echo "Downloading and unpacking R binaries ($R_BINARIES)" | indent
 
-mkdir -p /app
+ln -s $BUILD_DIR /app
+
 pushd /app > /dev/null
 curl $R_BINARIES -s -o - | tar xzf - -C .
 popd > /dev/null
@@ -77,8 +78,6 @@ export FAKECHROOT_DIR="$TOOLS_DIR/fakechroot"
 export CHROOT_DIR="/app/.root"
 export LD_LIBRARY_PATH="$FAKECHROOT_DIR/lib/fakechroot:$LD_LIBRARY_PATH"
 export PATH="$FAKECHROOT_DIR/sbin:$FAKECHROOT_DIR/bin:$PATH"
-
-ln -s $LP_DIR /app/.app
 
 # install dependencies from CRAN
 echo "Executing init.r script" | indent
@@ -111,11 +110,11 @@ fi
 mkdir -p "$BUILD_DIR/.profile.d"
 cp "$LP_DIR/bin/renv.sh" "$BUILD_DIR/.profile.d/renv.sh"
 
-# copy to build directory
-mkdir -p $BUILD_DIR/.tools
-cp -r /app/.tools/* $BUILD_DIR/.tools
+# # copy to build directory
+# mkdir -p $BUILD_DIR/.tools
+# cp -r /app/.tools/* $BUILD_DIR/.tools
 
-mkdir -p $BUILD_DIR/.root
-cp -r /app/.root/* $BUILD_DIR/.root
+# mkdir -p $BUILD_DIR/.root
+# cp -r /app/.root/* $BUILD_DIR/.root
 
 # TODO: cache build
