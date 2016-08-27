@@ -6,4 +6,3 @@ cat <<EOF
 default_process_types:
   console: fakechroot fakeroot chroot $CHROOT_DIR /usr/bin/R
 EOF
-

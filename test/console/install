@@ -27,7 +27,7 @@ app=$(heroku apps:info -j | jq -r '.app.name')
 git push heroku master
 
 # run R console
-heroku run:console --no-save -f prog.r --app $app
+heroku run prog.r --app $app
 
 popd
 
