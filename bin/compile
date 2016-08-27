@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+# fail fast
+set -e
+
+# debug
+# set -x
+
+shopt -s extglob
+
+function error() {
+  echo " !     $*" >&2
+  exit 1
+}
+
+function indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";;
+    *)      sed -u "$c";;
+  esac
+}
+
+function read_var() {
+  echo $(head -n 1 $1)
+}
+
+# parse and derive params
+LP_DIR=`cd $(dirname $0); cd ..; pwd`
+BUILD_DIR=$1
+CACHE_DIR=$2
+
+# fix STACK variable if unset
+if [ -z "${STACK}" ];
+then
+  STACK="cedar-14"
+fi
+
+# read in R version if file exists
+if [[ -f "$BUILD_DIR/.r-version" ]];
+then
+  R_VERSION=`read_var $BUILD_DIR/.r-version`
+  echo "NOTE: Using R version override [$R_VERSION]" | indent
+else
+  R_VERSION="3.3.1"
+fi
+
+# read in buildback binary version if file exists
+if [[ -f "$BUILD_DIR/.r-buildpack-version" ]];
+then
+  BUILD_PACK_VERSION=`read_var $BUILD_DIR/.r-buildpack-version`
+  echo "NOTE: Using buildback version override [$BUILD_PACK_VERSION]" | indent
+else
+  BUILD_PACK_VERSION="20160821-0331"
+fi
+
+S3_BUCKET="heroku-buildpack-r"
+R_BINARIES="http://${S3_BUCKET}.s3.amazonaws.com/${STACK}/R-${R_VERSION}-binaries-${BUILD_PACK_VERSION}.tar.gz"
+
+# vendor R into the slug
+echo "Vendoring R $R_VERSION for $STACK stack ($BUILD_PACK_VERSION)" | indent
+
+# TODO: find in cache
+
+# download and unpack binaries
+echo "Downloading and unpacking R binaries ($R_BINARIES)" | indent
+curl $R_BINARIES -s -o - | tar xzf - -C $BUILD_DIR
+
+# environment
+export TOOLS_DIR="$BUILD_DIR/.tools"
+export FAKECHROOT_DIR="$TOOLS_DIR/fakechroot"
+export CHROOT_DIR="$BUILD_DIR/.root"
+export PATH="$FAKECHROOT_DIR/sbin:$FAKECHROOT_DIR/bin:$PATH"
+
+# install dependencies from CRAN
+echo "Executing init.r script" | indent
+
+# set the CRAN mirror and run the init.r program
+# working directory must be BUILD_DIR so that local packages/scripts can be found
+fakechroot fakeroot chroot $CHROOT_DIR R --no-save -s <<RPROG 2>&1 | indent
+  cat("\n=====> init.r Starting...\n")
+  Sys.setenv(BUILD_DIR="$BUILD_DIR")
+  setwd("$BUILD_DIR")
+  r <- getOption("repos");
+  r["CRAN"] <- "$CRAN_MIRROR";
+  options(repos=r);
+  `cat $BUILD_DIR/init.r`
+  cat("\n=====> init.r Completed\n")
+RPROG
+
+# determine whether the R script failed
+result=$?
+if [[ "$result" -eq "0" ]]; then
+  echo "R $R_VERSION successfully installed" | indent
+else
+  echo -e "\033[1;31mERROR: R $R_VERSION failed while executing \"init.r\". Check the log for details.\033[0m" | indent
+fi
+
+# copy over environment
+mkdir -p "$BUILD_DIR/.profile.d"
+cp "$LP_DIR/bin/renv.sh" "$BUILD_DIR/.profile.d/renv.sh"
+
+# TODO: cache build
