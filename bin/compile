@@ -66,6 +66,8 @@ echo "Vendoring R $R_VERSION for $STACK stack ($BUILD_PACK_VERSION)" | indent
 # download and unpack binaries
 echo "Downloading and unpacking R binaries ($R_BINARIES)" | indent
 curl $R_BINARIES -s -o - | tar xzf - -C $BUILD_DIR
+mv $BUILD_DIR/app/.tools $BUILD_DIR/.tools
+mv $BUILD_DIR/app/.root $BUILD_DIR/.root
 
 # environment
 export TOOLS_DIR="$BUILD_DIR/.tools"
