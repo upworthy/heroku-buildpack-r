@@ -4,5 +4,5 @@
 cat <<EOF
 ---
 default_process_types:
-  console: fakechroot fakeroot chroot $CHROOT_DIR /usr/bin/R
+  console: /app/.tools/fakechroot/bin/fakechroot /usr/bin/fakeroot /usr/sbin/chroot /app/.root /usr/bin/R
 EOF

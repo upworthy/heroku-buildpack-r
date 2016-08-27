@@ -79,6 +79,8 @@ export PATH="$FAKECHROOT_DIR/sbin:$FAKECHROOT_DIR/bin:$PATH"
 # install dependencies from CRAN
 echo "Executing init.r script" | indent
 
+$FAKECHROOT_DIR/bin/fakechroot /usr/bin/fakeroot /usr/sbin/chroot $CHROOT_DIR ls -ahlR /usr/lib/R/etc
+
 # set the CRAN mirror and run the init.r program
 # working directory must be BUILD_DIR so that local packages/scripts can be found
 $FAKECHROOT_DIR/bin/fakechroot /usr/bin/fakeroot /usr/sbin/chroot $CHROOT_DIR /usr/bin/R --no-save -s <<RPROG 2>&1 | indent
