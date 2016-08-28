@@ -68,9 +68,12 @@ echo "Downloading and unpacking R binaries ($R_BINARIES)" | indent
 
 pushd /app > /dev/null
 curl $R_BINARIES -s -o - | tar xzf - -C .
-pushd .root > /dev/null
-ln -s $BUILD_DIR app
-popd > /dev/null
+
+mkdir -p /app/.root/app
+# pushd .root > /dev/null
+# ln -s $BUILD_DIR app
+# popd > /dev/null
+
 popd > /dev/null
 
 # environment
@@ -80,20 +83,25 @@ export CHROOT_DIR="/app/.root"
 export LD_LIBRARY_PATH="$FAKECHROOT_DIR/lib/fakechroot:$LD_LIBRARY_PATH"
 export PATH="$FAKECHROOT_DIR/sbin:$FAKECHROOT_DIR/bin:$PATH"
 
-# install dependencies from CRAN
-echo "Executing init.r script" | indent
-
 echo ======================================================================
+echo "#=== /app"
 ls -ahlR /app
 echo ======================================================================
+echo "#=== CHROOT /"
 $FAKECHROOT_DIR/bin/fakechroot /usr/bin/fakeroot /usr/sbin/chroot $CHROOT_DIR ls -ahlR /
 echo ======================================================================
+echo "# Environment..."
+( set -o posix; set )
+echo ======================================================================
+
+# install dependencies from CRAN
+echo "Executing init.r script" | indent
 
 # set the CRAN mirror and run the init.r program
 # working directory must be BUILD_DIR so that local packages/scripts can be found
 $FAKECHROOT_DIR/bin/fakechroot /usr/bin/fakeroot /usr/sbin/chroot $CHROOT_DIR /usr/bin/R --no-save -s <<RPROG 2>&1 | indent
   cat("\n=====> init.r Starting...\n")
-  setwd("/app/.app")
+  setwd("/app")
   r <- getOption("repos");
   r["CRAN"] <- "$CRAN_MIRROR";
   options(repos=r);
