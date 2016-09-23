@@ -32,6 +32,7 @@ unset GIT_DIR
 # parse and derive params
 BUILD_DIR=$1
 CACHE_DIR=$2
+ENV_DIR=$3
 LP_DIR=`cd $(dirname $0); cd ..; pwd`
 
 # ensure exist
@@ -185,6 +186,11 @@ fi
 if [[ -f "$BUILD_DIR/before_compile" ]]; then
   echo "-----> Executing before compile hook"
   source "$BUILD_DIR/before_compile"
+fi
+
+# Export compile time environmental vars
+if [ -f $ENV_DIR/GITHUB_PAT ];then
+  GITHUB_PAT="$(cat $ENV_DIR/GITHUB_PAT)"
 fi
 
 # https://cran.r-project.org/doc/manuals/r-release/R-exts.html
