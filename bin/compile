@@ -190,7 +190,7 @@ fi
 
 # Export compile time environmental vars
 if [ -f $ENV_DIR/GITHUB_PAT ];then
-  GITHUB_PAT="$(cat $ENV_DIR/GITHUB_PAT)"
+  export GITHUB_PAT="$(cat $ENV_DIR/GITHUB_PAT)"
 fi
 
 # https://cran.r-project.org/doc/manuals/r-release/R-exts.html
